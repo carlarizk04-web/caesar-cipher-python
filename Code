@@ -1,0 +1,411 @@
+import random
+import time
+
+
+# ============================================================
+#                  CAESAR CIPHER PROJECT
+# ============================================================
+
+WORDS = [
+    "python",
+    "computer",
+    "keyboard",
+    "internet",
+    "network",
+    "security",
+    "programming",
+    "algorithm",
+    "database",
+    "developer",
+    "software",
+    "hardware",
+    "firewall",
+    "encryption",
+    "technology",
+    "website",
+    "application",
+    "server",
+    "password",
+    "coding"
+]
+
+
+# ============================================================
+#                  CAESAR CIPHER FUNCTION
+# ============================================================
+
+def caesar_cipher(text, shift):
+    result = ""
+
+    for char in text:
+
+        if char.isalpha():
+
+            if char.isupper():
+                base = ord("A")
+            else:
+                base = ord("a")
+
+            new_char = chr(
+                (ord(char) - base + shift) % 26 + base
+            )
+
+            result += new_char
+
+        else:
+            # Keep spaces, numbers, and symbols unchanged
+            result += char
+
+    return result
+
+
+# ============================================================
+#                    ENCRYPT MESSAGE
+# ============================================================
+
+def encrypt_message():
+
+    print("\n" + "=" * 50)
+    print("                 ENCRYPT MESSAGE")
+    print("=" * 50)
+
+    text = input("\nEnter your message: ")
+
+    shift = get_shift()
+
+    encrypted = caesar_cipher(text, shift)
+
+    print("\n🔐 Encrypted message:")
+    print(encrypted)
+
+
+# ============================================================
+#                    DECRYPT MESSAGE
+# ============================================================
+
+def decrypt_message():
+
+    print("\n" + "=" * 50)
+    print("                 DECRYPT MESSAGE")
+    print("=" * 50)
+
+    text = input("\nEnter the encrypted message: ")
+
+    shift = get_shift()
+
+    decrypted = caesar_cipher(text, -shift)
+
+    print("\n🔓 Decrypted message:")
+    print(decrypted)
+
+
+# ============================================================
+#                    GET SHIFT VALUE
+# ============================================================
+
+def get_shift():
+
+    while True:
+
+        try:
+            shift = int(
+                input("Enter shift value (1-25): ")
+            )
+
+            if 1 <= shift <= 25:
+                return shift
+
+            print("❌ Shift must be between 1 and 25.")
+
+        except ValueError:
+            print("❌ Please enter a valid number.")
+
+
+# ============================================================
+#                    DIFFICULTY
+# ============================================================
+
+def choose_difficulty():
+
+    print("\n" + "=" * 50)
+    print("                  DIFFICULTY")
+    print("=" * 50)
+
+    print("1. Easy")
+    print("2. Medium")
+    print("3. Hard")
+
+    while True:
+
+        choice = input("\nChoose difficulty: ").strip()
+
+        if choice == "1":
+            return "Easy", 3, 20
+
+        elif choice == "2":
+            return "Medium", 2, 15
+
+        elif choice == "3":
+            return "Hard", 1, 10
+
+        else:
+            print("❌ Please choose 1, 2, or 3.")
+
+
+# ============================================================
+#                    PLAY GAME ROUND
+# ============================================================
+
+def play_round(difficulty, attempts, time_limit):
+
+    word = random.choice(WORDS)
+
+    shift = random.randint(1, 25)
+
+    encrypted_word = caesar_cipher(word, shift)
+
+    print("\n" + "=" * 50)
+    print("                   NEW ROUND")
+    print("=" * 50)
+
+    print(f"\nDifficulty : {difficulty}")
+    print(f"Encrypted : {encrypted_word}")
+    print(f"Shift     : {shift}")
+    print(f"Attempts  : {attempts}")
+    print(f"Time      : {time_limit} seconds")
+
+    print("\nDecode the encrypted word!")
+
+    start_time = time.time()
+
+    for attempt in range(1, attempts + 1):
+
+        elapsed = time.time() - start_time
+
+        if elapsed >= time_limit:
+
+            print("\n⏰ TIME'S UP!")
+            print(f"The correct word was: {word}")
+
+            return 0
+
+        print(f"\nAttempt {attempt}/{attempts}")
+
+        guess = input("Your answer: ").strip().lower()
+
+        # Check timer after input
+        elapsed = time.time() - start_time
+
+        if elapsed >= time_limit:
+
+            print("\n⏰ TIME'S UP!")
+            print(f"The correct word was: {word}")
+
+            return 0
+
+        if guess == word:
+
+            points = 10
+
+            # First-attempt bonus
+            if attempt == 1:
+                points += 5
+
+            # Time bonus
+            if elapsed <= time_limit / 2:
+                points += 5
+
+            print("\n🎉 CORRECT!")
+            print(f"The word was: {word}")
+            print(f"Time: {elapsed:.2f} seconds")
+            print(f"Points earned: {points}")
+
+            return points
+
+        else:
+
+            if attempt < attempts:
+                print("❌ Incorrect! Try again.")
+
+            else:
+                print("\n❌ No attempts remaining.")
+                print(f"The correct word was: {word}")
+
+    return 0
+
+
+# ============================================================
+#                    START GAME
+# ============================================================
+
+def start_game():
+
+    print("\n" + "=" * 55)
+    print("             🔐 CAESAR CIPHER CHALLENGE")
+    print("=" * 55)
+
+    print("""
+Decode the encrypted word using the Caesar Cipher.
+
+You will receive:
+• An encrypted word
+• A shift value
+• A limited number of attempts
+• A time limit
+
+Good luck!
+""")
+
+    difficulty, attempts, time_limit = choose_difficulty()
+
+    score = 0
+    rounds = 0
+
+    while True:
+
+        rounds += 1
+
+        points = play_round(
+            difficulty,
+            attempts,
+            time_limit
+        )
+
+        score += points
+
+        print("\n" + "-" * 50)
+        print(f"Current score: {score}")
+        print("-" * 50)
+
+        choice = input(
+            "\nPlay another round? (y/n): "
+        ).strip().lower()
+
+        if choice != "y":
+            break
+
+    print("\n" + "=" * 50)
+    print("                 GAME OVER")
+    print("=" * 50)
+
+    print(f"Rounds played : {rounds}")
+    print(f"Final score   : {score}")
+
+    if score >= rounds * 15:
+        print("🏆 Excellent performance!")
+
+    elif score >= rounds * 10:
+        print("👏 Great job!")
+
+    elif score > 0:
+        print("👍 Good effort!")
+
+    else:
+        print("Keep practicing!")
+
+    print("=" * 50)
+
+
+# ============================================================
+#                    HOW TO PLAY
+# ============================================================
+
+def show_instructions():
+
+    print("\n" + "=" * 55)
+    print("                   HOW TO PLAY")
+    print("=" * 55)
+
+    print("""
+The Caesar Cipher is a simple encryption technique.
+
+Each letter is shifted by a fixed number of positions
+in the alphabet.
+
+Example:
+
+Original : HELLO
+Shift    : 3
+Encrypted: KHOOR
+
+The game gives you an encrypted word.
+
+Your goal is to decode the word and enter the
+original word before your attempts or time run out.
+
+Difficulty:
+
+Easy:
+• 3 attempts
+• 20 seconds
+
+Medium:
+• 2 attempts
+• 15 seconds
+
+Hard:
+• 1 attempt
+• 10 seconds
+
+Scoring:
+
+Correct answer       = 10 points
+First attempt bonus  = +5 points
+Fast answer bonus    = +5 points
+""")
+
+
+# ============================================================
+#                       MAIN MENU
+# ============================================================
+
+def main():
+
+    while True:
+
+        print("\n")
+        print("=" * 55)
+        print("              🔐 CAESAR CIPHER")
+        print("=" * 55)
+
+        print("\n1. 🎮 Play Cipher Challenge")
+        print("2. 🔐 Encrypt a Message")
+        print("3. 🔓 Decrypt a Message")
+        print("4. 📖 How to Play")
+        print("5. ❌ Exit")
+
+        choice = input("\nChoose an option: ").strip()
+
+        if choice == "1":
+
+            start_game()
+
+        elif choice == "2":
+
+            encrypt_message()
+
+        elif choice == "3":
+
+            decrypt_message()
+
+        elif choice == "4":
+
+            show_instructions()
+
+        elif choice == "5":
+
+            print("\nThank you for using Caesar Cipher!")
+            print("Goodbye! 👋")
+            break
+
+        else:
+
+            print("❌ Invalid choice. Please select 1-5.")
+
+
+# ============================================================
+#                    PROGRAM START
+# ============================================================
+
+if __name__ == "__main__":
+    main()
